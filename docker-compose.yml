@@ -1,0 +1,46 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:1.51.0
+    volumes:
+      - n8n-data:/app/.n8n
+      - n8n-history:/history
+    ports:
+      - 5678:5678
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - n8n-db
+      - rabbitmq
+  n8n-db:
+    container_name: n8n_db
+    hostname: db
+    image: postgres:16-bullseye
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DB: 'n8n'
+      POSTGRES_PASSWORD: 'n8n'
+      POSTGRES_HOST_AUTH_METHOD: 'trust'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    ports:
+      - 5433:5432
+    volumes:
+      - n8n-db:/var/lib/postgresql/data
+  
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+volumes:
+  n8n-data:
+  n8n-history:
+  n8n-db:
