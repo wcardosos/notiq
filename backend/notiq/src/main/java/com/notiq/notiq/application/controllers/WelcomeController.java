@@ -1,4 +1,4 @@
-package com.notiq.notiq.infra.controllers;
+package com.notiq.notiq.application.controllers;
 
 import com.notiq.notiq.domain.services.WelcomeService;
 import org.springframework.beans.factory.annotation.Autowired;
